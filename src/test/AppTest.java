@@ -28,12 +28,14 @@ public class AppTest {
         System.setErr(null);
     }
 
+    /*
     @Test
     public void testMain() throws IOException {
         String[] args = new String[]{"go"};
         Main.main(args);
         Assert.assertTrue(true);
     }
+    */
 
     @Test
     public void testData() throws IOException {
@@ -43,16 +45,41 @@ public class AppTest {
 
     @Test
     public void testTestcase() throws URISyntaxException, IOException {
+        Main tc1 = new Main();
         int[] answer1 = new int[5];
-        Main.testcase("testcase1", answer1);
-        Assert.assertArrayEquals("Test Case 1 "+ Arrays.toString(answer1), new int[]{3, 3, 3, 0, 0}, answer1);
+        tc1.testcase("testcase1", answer1);
+        Assert.assertArrayEquals("Test Case 1 " + Arrays.toString(answer1), new int[]{3, 3, 3, 0, 0}, answer1);
     }
 
     @Test
-    public void testTestcaseDefault() throws URISyntaxException, IOException {
+    public void testTestcase2() throws URISyntaxException, IOException {
+        Main tc2 = new Main();
         int[] answer1 = new int[5];
-        Main.testcase("",answer1);
-        Assert.assertArrayEquals("Test Case Default "+ Arrays.toString(answer1), new int[]{2, 3, 3, 0, 0}, answer1);
+        tc2.testcase("testcase2", answer1);
+        Assert.assertArrayEquals("Test Case 2 "+ Arrays.toString(answer1), new int[]{3, 3, 2, 0, 0}, answer1);
+    }
+
+    @Test
+    public void testTestcase3() throws URISyntaxException, IOException {
+        Main tc3 = new Main();
+        int[] answer1 = new int[5];
+        tc3.testcase("testcase3", answer1);
+        Assert.assertArrayEquals("Test Case 3 "+ Arrays.toString(answer1), new int[]{3, 3, 1, 1, 0}, answer1);
+    }
+
+    @Test
+    public void testTestcase4() throws URISyntaxException, IOException {
+        Main tc4 = new Main();
+        int[] answer1 = new int[5];
+        tc4.testcase("testcase4", answer1);
+        Assert.assertArrayEquals("Test Case 4 "+ Arrays.toString(answer1), new int[]{7, 1, 0, 0, 0}, answer1);
+    }
+    @Test
+    public void testTestcase5() throws URISyntaxException, IOException {
+        Main tc5 = new Main();
+        int[] answer1 = new int[5];
+        tc5.testcase("testcase5", answer1);
+        Assert.assertArrayEquals("Test Case 5 "+ Arrays.toString(answer1), new int[]{6, 3, 2, 1, 0}, answer1);
     }
 
     @Test
