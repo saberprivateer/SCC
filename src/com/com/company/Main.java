@@ -3,7 +3,6 @@ package com.company;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 
 public class Main {
 
@@ -18,8 +17,8 @@ public class Main {
         int s;
         //get the # of nodes
         int n = g.get(g.size() - 1)[0];
-        for (int j = 0; j < g.size(); j++) {
-            n = Math.max(n, g.get(j)[1]);
+        for (int[] aG : g) {
+            n = Math.max(n, aG[1]);
         }
         log("number of nodes, n=" + n);
         int[] exp = new int[n];
@@ -27,13 +26,24 @@ public class Main {
         Arrays.fill(exp, -1);
         Arrays.fill(finish, -1);
 
+        double explored;
+        double percentexp;
+
         //First pass
         log("START FIRST PASS");
         for (int i = n; i > 0; i--) {
-            log("i is currently "+i);
+            explored = 0;
+            for (int anExp : exp) {
+                if (anExp > 0) {
+                    explored++;
+                }
+            }
+            percentexp = (explored/exp.length*100);
+            log(String.format("%.2f" ,percentexp)+"% loop completed. "+(int) explored+"/"+exp.length);
+
             if (exp[i - 1] < 0) {
                 s = i;
-                System.out.println(Arrays.toString(exp)+" and i="+i);
+                //System.out.println(Arrays.toString(exp)+" and i="+i);
                 dfs(g, i, s, exp, finish, "rev");
             }
         }
@@ -44,6 +54,15 @@ public class Main {
         int fstart;
         int j;
         for (int i = n; i > 0; i--) {
+            explored = 0;
+            for (int anExp : exp) {
+                if (anExp > 0) {
+                    explored++;
+                }
+            }
+            percentexp = explored/exp.length*100;
+            log(String.format("%.2f",percentexp)+"% loop completed. "+(int) explored+"/"+exp.length);
+
             //log("i is currently "+i);
             j=0;
             while (finish[j] != i) {
@@ -89,7 +108,7 @@ public class Main {
         int last;
 
         //System.out.println(Arrays.toString(exp));
-        if (dir == "rev") {
+        if (dir.equals("rev")) {
             first = 1;
             last = 0;
         } else {
@@ -116,54 +135,51 @@ public class Main {
         Main.t++;
         if(dir.equals("rev")){
         finish[i - 1] = Main.t;}
+        /*
         if (dir.equals("rev")) {
             //System.out.println("Finish = " + Arrays.toString(finish));
         } else {
             //System.out.println("Exp = " + Arrays.toString(exp));
         }
+        */
         //log("end of dfs");
     }
 
     public static void testcase(String datafile, int[] answer) throws IOException {
         ArrayList<int[]> edges = new ArrayList<>();
+
+        long startparse = System.nanoTime();
+
         parsedata(edges, datafile);
-        /*
-        long startTime = System.nanoTime();
-        for (int i = 0;i<edges.size();i++) {
-            edges.get(i);
-        }
-        long endTime = System.nanoTime();
-        long duration = (endTime - startTime);
-        log("Looping the array takes "+duration/1000000+" milliseconds");
-        */
-        //System.out.println(edges.get(0)[0]);
+
+        long endparse = System.nanoTime();
+        long parseduration = (endparse-startparse);
+        log("Parse ran for "+parseduration/1000000+" milliseconds");
+
         Main.t=0;
         dfsloop(edges,answer);
-        //a = new int[]{3, 3, 3, 0, 0};
-        //System.arraycopy(a, 0, answer, 0, a.length);
         System.out.println("The answer to " + datafile + " is " + Arrays.toString(answer));
     }
 
     public static void main(String[] args) throws IOException {
+        long startTime = System.nanoTime();
+
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("testcase3", answer);/*
-        Arrays.fill(answer, 0);
-        testcase("testcase2", answer);
-        Arrays.fill(answer, 0);
-        testcase("testcase3", answer);*/
-        //testcase("", answer);
-        //ArrayList<int[]> edges = new ArrayList<>();
-        //parsedata(edges, "testcase1");
+        testcase("SCC", answer);
         log("End Program");
+
+        long endTime = System.nanoTime();
+        long duration = (endTime - startTime);
+        log("Program ran for "+duration/1000000+" milliseconds");
     }
 
     public static void parsedata(ArrayList<int[]> edges, String datafile) throws IOException {
         String[] arr = data(datafile);
 
-        for (int i = 0; i < arr.length; i++) {
+        for (String anArr : arr) {
             String[] temp;
-            temp = arr[i].split("\\s+");
+            temp = anArr.split("\\s+");
             int[] temparr = new int[2];
             for (int j = 0; j < temp.length; j++) {
                 temparr[j] = Integer.valueOf(temp[j]);
@@ -177,12 +193,9 @@ public class Main {
         //Name of the file
         String filePath = new File("").getAbsolutePath();
         String fullPath = filePath + "/src/Files/" + datafile + ".txt";
-        //ArrayList<String> integers = new ArrayList<String>();
-        //ArrayList<Integer> ints = new ArrayList<Integer>();
 
         LineNumberReader lnr = new LineNumberReader(new FileReader(new File(fullPath)));
         lnr.skip(Long.MAX_VALUE);
-        //System.out.println(lnr.getLineNumber());
         //Add 1 because line index starts at 0
         // Finally, the LineNumberReader object should be closed to prevent resource leak
         String[] arr = new String[lnr.getLineNumber() + 1];
@@ -214,12 +227,9 @@ public class Main {
         int i;
         int temp;
         int mid;
-        //log("left is "+l+" and r is "+r);
 
 
         if (r - l > 1) {
-            //log("Partition called, not base case.");
-            //Main.countcomparison += r - l - 1;
             switch (choose) {
                 case "first":
                     p = args[l];
@@ -268,7 +278,6 @@ public class Main {
             }
             i = l + 1;
             for (int j = i; j < r; j++) {
-                //counteach++;
                 if (args[j] < p) {
                     temp = args[j];
                     args[j] = args[i];
@@ -280,8 +289,6 @@ public class Main {
             args[i - 1] = args[l];
             args[l] = temp;
 
-            //log("The index i is " + i + ", l is " + l + " and r is " + r + ".");
-            //System.out.println(Arrays.toString(args));
             //Partition on the left
             partition(args, choose, l, i - 1);
             //Partition on the right
