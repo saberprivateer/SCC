@@ -18,7 +18,7 @@ public class Main {
         int s;
         //get the # of nodes
         int n = g.get(g.size() - 1)[0];
-        for (int j = 0; j < g.get(g.size() - 1)[0]; j++) {
+        for (int j = 0; j < g.size(); j++) {
             n = Math.max(n, g.get(j)[1]);
         }
         log("number of nodes, n=" + n);
@@ -30,10 +30,10 @@ public class Main {
         //First pass
         log("START FIRST PASS");
         for (int i = n; i > 0; i--) {
-            //log("i is currently "+i);
+            log("i is currently "+i);
             if (exp[i - 1] < 0) {
                 s = i;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
+                System.out.println(Arrays.toString(exp)+" and i="+i);
                 dfs(g, i, s, exp, finish, "rev");
             }
         }
@@ -147,7 +147,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("testcase2", answer);/*
+        testcase("testcase3", answer);/*
         Arrays.fill(answer, 0);
         testcase("testcase2", answer);
         Arrays.fill(answer, 0);
