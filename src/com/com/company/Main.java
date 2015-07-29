@@ -96,7 +96,7 @@ public class Main {
         scc[2] = count[count.length - 3];
         scc[3] = count[count.length - 4];
         scc[4] = count[count.length - 5];
-        System.out.println("SCC="+Arrays.toString(scc));
+        System.out.println("SCC=" + Arrays.toString(scc));
 
 
     }
@@ -129,7 +129,7 @@ public class Main {
         Arrays.fill(finish, -1);
 
         Stack stack = new Stack();
-        System.out.println("stack: " + stack);
+        //System.out.println("stack: " + stack);
 
         //First pass
         log("START FIRST PASS");
@@ -244,12 +244,12 @@ public class Main {
         Arrays.fill(finish, -1);
 
         Stack stack = new Stack();
-        System.out.println("stack: " + stack);
+        //System.out.println("stack: " + stack);
 
         int time = 0;
         //for each vertex u
         for (int i = n; i > 0; i--) {
-            log("i = " + i);
+            //log("i = " + i);
             //if u.color = WHITE
             time = 0;
             if (exp[i - 1] < 0) {
@@ -257,16 +257,16 @@ public class Main {
                 exp[i - 1] = 0;
                 Arrays.fill(vexp, -1);
                 vexp[i - 1] = 0;
-                System.out.println("Explored: " + Arrays.toString(exp));
+                //System.out.println("Explored: " + Arrays.toString(exp));
                 //time = time + 1
                 //time++;
                 //push(u,S)
                 stack.push(i);
-                System.out.println("stack after push: " + stack);
+                //System.out.println("stack after push: " + stack);
                 //while stack not empty
 
                 while (!stack.empty()) {
-                    log("run while loop");
+                    //log("run while loop");
                     //pop(stack)
                     s = (int) stack.pop();
                     //for each vertex v g.adjacent(u)
@@ -279,12 +279,12 @@ public class Main {
                             if (vexp[g.get(j)[0] - 1] < 0) {
                                 //v.color = gray
                                 vexp[g.get(j)[0] - 1] = 0;
-                                System.out.println("Explored: " + Arrays.toString(vexp));
+                                //System.out.println("Explored: " + Arrays.toString(vexp));
                                 //time = time + 1
                                 time++;
                                 //push(v)
                                 stack.push(g.get(j)[0]);
-                                System.out.println("Stack after push (while): " + stack);
+                                //System.out.println("Stack after push (while): " + stack);
                             }
                         }
                     }
@@ -295,7 +295,7 @@ public class Main {
                 time++;
                 //log(time);
                 finish[i - 1] = time;
-                System.out.println("Finish times: " + Arrays.toString(finish));
+                //System.out.println("Finish times: " + Arrays.toString(finish));
             }
         }
 
@@ -397,13 +397,14 @@ public class Main {
         //Name of the file
         String filePath = new File("").getAbsolutePath();
         String fullPath = filePath + "/src/Files/" + datafile + ".txt";
+            LineNumberReader lnr = new LineNumberReader(new FileReader(new File(fullPath)));
+            lnr.skip(Long.MAX_VALUE);
+            //Add 1 because line index starts at 0
+            // Finally, the LineNumberReader object should be closed to prevent resource leak
+            String[] arr = new String[lnr.getLineNumber() + 1];
+            lnr.close();
 
-        LineNumberReader lnr = new LineNumberReader(new FileReader(new File(fullPath)));
-        lnr.skip(Long.MAX_VALUE);
-        //Add 1 because line index starts at 0
-        // Finally, the LineNumberReader object should be closed to prevent resource leak
-        String[] arr = new String[lnr.getLineNumber() + 1];
-        lnr.close();
+
         try {
             //Create object of FileReader
             FileReader inputFile = new FileReader(filePath + "/src/Files/" + datafile + ".txt");
