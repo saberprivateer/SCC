@@ -12,15 +12,10 @@ public class Main {
 
     public static int t = 0;
 
-    public static void dfsloop(ArrayList<int[]> g, int[] scc) {
+    public static void dfsloop(ArrayList<int[]> g, int[] scc,int n) {
         log("Start dfs loop");
         int s;
-        //get the # of nodes
-        int n = g.get(g.size() - 1)[0];
-        for (int[] aG : g) {
-            n = Math.max(n, aG[1]);
-        }
-        log("number of nodes, n=" + n);
+
         int[] exp = new int[n];
         int[] finish = new int[n];
         Arrays.fill(exp, -1);
@@ -147,18 +142,29 @@ public class Main {
 
     public static void testcase(String datafile, int[] answer) throws IOException {
         ArrayList<int[]> edges = new ArrayList<>();
+        ArrayList<int[]> adj = new ArrayList<>();
+        ArrayList<int[]> adjrev = new ArrayList<>();
 
         long startparse = System.nanoTime();
 
         parsedata(edges, datafile);
+        int n=maxnodes(edges);
+
+        convertToAdjacency(edges, adj, "fwd");
+        convertToAdjacency(edges, adjrev,"rev");
+        log("#nodes = "+n);
+//        log("Final Adjacency:");
+//        for (int i = 0;i<adj.size();i++) {
+//            log(Arrays.toString(adj.get(i)));
+//        }
 
         long endparse = System.nanoTime();
         long parseduration = (endparse-startparse);
-        log("Parse ran for "+parseduration/1000000+" milliseconds");
+        log("Pre-processing (extraction, parsing, conversion) ran for " + parseduration / 1000000 + " milliseconds");
 
         Main.t=0;
-        dfsloop(edges,answer);
-        System.out.println("The answer to " + datafile + " is " + Arrays.toString(answer));
+//        dfsloop(edges,answer,n);
+//      System.out.println("The answer to " + datafile + " is " + Arrays.toString(answer));
     }
 
     public static void main(String[] args) throws IOException {
@@ -166,12 +172,64 @@ public class Main {
 
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("SCC", answer);
+        testcase("testcase1", answer);
         log("End Program");
 
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        log("Program ran for "+duration/1000000+" milliseconds");
+        log("Program ran for " + duration / 1000000 + " milliseconds");
+    }
+
+    public static int maxnodes(ArrayList<int[]> edges){
+        //log("start maxnodes");
+        //log(edges.size());
+        int n = edges.get(edges.size() - 1)[0];
+        //log("start iterating max nodes");
+        for (int[] aG : edges) {
+            n = Math.max(n, aG[1]);
+        }
+        return n;
+    }
+
+    public static void convertToAdjacency(ArrayList<int[]> edges,ArrayList<int[]> alist, String dir){
+        log("Begin Convert to Adjacency");
+        ArrayList<Integer> hold = new ArrayList<>();
+        int[] converthold;
+        int n = maxnodes(edges);
+
+        //log("The max number of entries is "+n);
+
+        int first=0;
+        int last=1;
+
+        if (dir.equals("rev")){
+            first = 1;
+            last = 0;
+        }
+
+        boolean exists;
+
+        for (int i=1;i<=n;i++){
+            exists=false;
+            hold.clear();
+            hold.add(0, i);
+            //log("hold = "+hold);
+            for (int j=0;j<edges.size();j++){
+                if(edges.get(j)[first]==i){
+                    exists=true;
+                    hold.add(edges.get(j)[last]);
+                }
+            }
+            if(exists) {
+                converthold = new int[hold.size()];
+                for (int k=0;k<hold.size();k++){
+                    converthold[k]=hold.get(k);
+                }
+                //log(Arrays.toString(converthold));
+                alist.add(converthold);
+            }
+
+        }
     }
 
     public static void parsedata(ArrayList<int[]> edges, String datafile) throws IOException {
