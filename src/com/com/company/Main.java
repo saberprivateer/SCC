@@ -49,7 +49,7 @@ public class Main {
         }
         partitionlinked(args, 0, args.length, linked);
         for (int i = 0; i < g.size(); i++) {
-            gsort.add(i, new int[]{args[i],linked[i]});
+            gsort.add(i, new int[]{args[i], linked[i]});
         }
     }
 
@@ -69,33 +69,22 @@ public class Main {
 
         ArrayList<int[]> grev = new ArrayList<>();
         ArrayList<int[]> gsort = new ArrayList<>();
-        log("grev initial size:" + grev.size());
         preprocess(g, grev);
-        log("preprocessing comlete - " + grev.get(grev.size() - 1)[1]);
-
-        System.out.println("grev:");
-        for (int[] aG : grev) {
-            System.out.println(Arrays.toString(aG));
-        }
+        log("preprocessor step 1 complete");
 
         //First pass
         log("START FIRST PASS");
         for (int i = n; i > 0; i--) {
-//            howfar(exp);
+            howfar(exp);
             if (exp[i - 1] < 0) {
                 s = i;
                 //System.out.println(Arrays.toString(exp)+" and i="+i);
-                dfs(grev, i, s, exp, finish, "rev");
+                dfsrev(grev, i, s, exp, finish);
             }
         }
 
         log("");
         preprocesssecond(g, gsort);
-        System.out.println(Arrays.toString(finish));
-        System.out.println("g:");
-        for (int[] aG : gsort) {
-            System.out.println(Arrays.toString(aG));
-        }
         //Second pass
         log("START SECOND PASS");
         Arrays.fill(exp, -1);
@@ -103,24 +92,18 @@ public class Main {
         int j;
         for (int i = n; i > 0; i--) {
 
-//            howfar(exp);
-
-            //log("i is currently "+i);
+            howfar(exp);
             j = 0;
             while (finish[j] != i) {
-                //log("finish[j]="+finish[j]+" and i="+i);
                 j++;
             }
             fstart = j + 1;
             if (exp[fstart - 1] < 0) {
                 s = fstart;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
-                //log("Start dfs from outerloop");
                 dfs(gsort, fstart, s, exp, finish, "fwd");
             }
         }
         countscc(exp, scc);
-        System.out.println(Arrays.toString(exp));
     }
 
     public static void countscc(int[] exp, int[] scc) {
@@ -143,13 +126,39 @@ public class Main {
     }
 
 
+    public static void dfsrev(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish) {
+        exp[i - 1] = s;
+        int len = g.size();
+        int head;
+        int locate = 0;
+        while (g.get(locate)[1] != i) {
+            locate++;
+            if (locate >= len) {
+                break;
+            }
+        }
+        if (locate < len) {
+            while (g.get(locate)[1] == i) {
+
+                head = g.get(locate)[0];
+                if (exp[head - 1] < 0) {
+                    dfsrev(g, head, s, exp, finish);
+                }
+                locate++;
+                if (locate >= len) {
+                    break;
+                }
+            }
+        }
+        Main.t++;
+        finish[i - 1] = Main.t;
+    }
+
     public static void dfs(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish, String dir) {
-        log("Start dfs with i=" + i + " and s=" + s);
         exp[i - 1] = s;
         int first;
         int last;
         int len = g.size();
-        //System.out.println(Arrays.toString(exp));
         if (dir.equals("rev")) {
             first = 1;
             last = 0;
@@ -167,42 +176,24 @@ public class Main {
                 break;
             }
         }
-        log("locate = " + locate);
-        int ch;
+
         if (locate < len) {
             while (g.get(locate)[first] == i) {
-//        for (int j = locate; j < g.size(); j++) {
-                ch = g.get(locate)[first];
-                log("loop is searching for " + i + "==" + ch);
-//            if (g.get(j)[first] == i) {
+
                 head = g.get(locate)[last];
-                //log("head="+head);
-                //log("The vector "+g.get(j)[0]+"->"+head);
                 if (exp[head - 1] < 0) {
-                    //log("recurse on dfs " + head);
                     dfs(g, head, s, exp, finish, dir);
                 }
-//
                 locate++;
                 if (locate >= len) {
                     break;
                 }
             }
         }
-
-
         Main.t++;
         if (dir.equals("rev")) {
             finish[i - 1] = Main.t;
         }
-        /*
-        if (dir.equals("rev")) {
-            //System.out.println("Finish = " + Arrays.toString(finish));
-        } else {
-            //System.out.println("Exp = " + Arrays.toString(exp));
-        }
-        */
-        //log("end of dfs");
     }
 
     public static void testcase(String datafile, int[] answer) throws IOException {
@@ -226,7 +217,7 @@ public class Main {
 
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("testcase3", answer);
+        testcase("SCC", answer);
         log("End Program");
 
         long endTime = System.nanoTime();
