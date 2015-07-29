@@ -13,75 +13,6 @@ public class Main {
 
     public static int t = 0;
 
-    public static void dfsloop(ArrayList<int[]> g, int[] scc) {
-        log("Start dfs loop");
-        int s;
-        //get the # of nodes
-        int n = g.get(g.size() - 1)[0];
-        for (int[] aG : g) {
-            n = Math.max(n, aG[1]);
-        }
-        //log("number of nodes, n=" + n);
-        int[] exp = new int[n];
-        int[] finish = new int[n];
-        Arrays.fill(exp, -1);
-        Arrays.fill(finish, -1);
-
-        double explored;
-        double percentexp;
-
-        //First pass
-        log("START FIRST PASS");
-        for (int i = n; i > 0; i--) {
-            explored = 0;
-            for (int anExp : exp) {
-                if (anExp > 0) {
-                    explored++;
-                }
-            }
-            percentexp = (explored / exp.length * 100);
-            log(String.format("%.2f", percentexp) + "% loop completed. " + (int) explored + "/" + exp.length);
-
-            if (exp[i - 1] < 0) {
-                s = i;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
-                dfs(g, i, s, exp, finish, "rev");
-            }
-        }
-
-        //Second pass
-        log("START SECOND PASS");
-        Arrays.fill(exp, -1);
-        int fstart;
-        int j;
-        for (int i = n; i > 0; i--) {
-            explored = 0;
-            for (int anExp : exp) {
-                if (anExp > 0) {
-                    explored++;
-                }
-            }
-            percentexp = explored / exp.length * 100;
-            log(String.format("%.2f", percentexp) + "% loop completed. " + (int) explored + "/" + exp.length);
-
-            //log("i is currently "+i);
-            j = 0;
-            while (finish[j] != i) {
-                //log("finish[j]="+finish[j]+" and i="+i);
-                j++;
-            }
-            fstart = j + 1;
-            if (exp[fstart - 1] < 0) {
-                s = fstart;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
-                //log("Start dfs from outerloop");
-                dfs(g, fstart, s, exp, finish, "fwd");
-            }
-        }
-        countscc(exp, scc);
-        //System.out.println(Arrays.toString(finish));
-    }
-
     public static void countscc(int[] exp, int[] scc) {
         //System.out.println(Arrays.toString(exp));
         int[] count = new int[exp.length];
@@ -114,238 +45,50 @@ public class Main {
 
     }
 
-    public static void dfsloopstack(ArrayList<int[]> g, int[] scc) {
-        log("Start dfs loop");
-        int s;
-        //get the # of nodes
-        int n = g.get(g.size() - 1)[0];
-        for (int[] aG : g) {
-            n = Math.max(n, aG[1]);
-        }
-        //log("number of nodes, n=" + n);
-        int[] exp = new int[n];
-        int[] finish = new int[n];
-        Arrays.fill(exp, -1);
-        Arrays.fill(finish, -1);
-
-        Stack stack = new Stack();
-        //System.out.println("stack: " + stack);
-
-        //First pass
-        log("START FIRST PASS");
-        for (int i = n; i > 0; i--) {
-
-            //howfar(exp);
-            if (stack.empty()) {
-
-                if (exp[i - 1] < 0) {
-                    s = i;
-                    //System.out.println(Arrays.toString(exp)+" and i="+i);
-                    dfsstack(g, i, s, exp, finish, stack, "rev");
-                }
-            } else {
-                Integer a = (Integer) stack.pop();
-                s = a;
-                dfsstack(g, i, s, exp, finish, stack, "rev");
-            }
-
-        }
-
-        //Second pass
-        log("START SECOND PASS");
-        Arrays.fill(exp, -1);
-        int fstart;
-        int j;
-        for (int i = n; i > 0; i--) {
-
-            //howfar(exp);
-
-            //log("i is currently "+i);
-            j = 0;
-            while (finish[j] != i) {
-                //log("finish[j]="+finish[j]+" and i="+i);
-                j++;
-            }
-            fstart = j + 1;
-            if (exp[fstart - 1] < 0) {
-                s = fstart;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
-                //log("Start dfs from outerloop");
-                dfs(g, fstart, s, exp, finish, "fwd");
-            }
-        }
-        countscc(exp, scc);
-        //System.out.println(Arrays.toString(finish));
-    }
-
-    public static void dfsstack(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish, Stack stack, String dir) {
-        //log("Start dfs with i=" + i + " and s=" + s);
-        exp[i - 1] = s;
-        int first;
-        int last;
-
-        //System.out.println(Arrays.toString(exp));
-        if (dir.equals("rev")) {
-            first = 1;
-            last = 0;
-        } else {
-            first = 0;
-            last = 1;
-        }
-
-        int head;
-        int ft = 1;
-        Stack istack = new Stack();
-
-        istack.push(i);
-        while (istack.empty()) {
-            for (int j = 0; j < g.size(); j++) {
-                if (g.get(j)[first] == i) {
-                    head = g.get(j)[last];
-                    //log("head="+head);
-                    //log("The vector "+g.get(j)[0]+"->"+head);
-                    if (exp[head - 1] < 0) {
-                        log("add " + head + " to the stack");
-                        stack.push(head);
-                    }
-                    if (j > g.size()) {
-                        break;
-                    }
-                }
-            }
-        }
-        //Main.t++;
-        if (dir.equals("rev")) {
-            finish[i - 1] = Main.t;
-        }
-
-        if (dir.equals("rev")) {
-            System.out.println("Finish = " + Arrays.toString(finish));
-        } else {
-            System.out.println("Exp = " + Arrays.toString(exp));
-        }
-
-        //log("end of dfs");
-    }
-
     public static void dfsOnce(ArrayList<int[]> g, int[] answer) {
-        log("Start dfsOnce loop");
-        int s;
-        //get the # of nodes
+        int v;
+        int temp;
         int n = g.get(g.size() - 1)[0];
         for (int[] aG : g) {
             n = Math.max(n, aG[1]);
         }
-        log("number of nodes, n=" + n);
-        int[] exp = new int[n];
-        int[] finish = new int[n];
-        int[] vexp = new int[n];
-        Arrays.fill(exp, -1);
-        Arrays.fill(finish, -1);
-
         Stack stack = new Stack();
-        //System.out.println("stack: " + stack);
-
+        int[] exp = new int[n];
+        int[] expgray = new int[n];
+        int[] finish = new int[n];
+//        Arrays.fill(exp, -1);
+        log(n + " = size");
         int time = 0;
-        //for each vertex u
         for (int i = n; i > 0; i--) {
-            //log("i = " + i);
-            //if u.color = WHITE
-            time = 0;
-            if (exp[i - 1] < 0) {
-                //u.color = GRAY
-                exp[i - 1] = 0;
-                Arrays.fill(vexp, -1);
-                vexp[i - 1] = 0;
-                //System.out.println("Explored: " + Arrays.toString(exp));
-                //time = time + 1
-                //time++;
-                //push(u,S)
-                stack.push(i);
-                //System.out.println("stack after push: " + stack);
-                //while stack not empty
-
-                while (!stack.empty()) {
-                    //log("run while loop");
-                    //pop(stack)
-                    s = (int) stack.pop();
-                    //for each vertex v g.adjacent(u)
-                    for (int j = 0; j < g.size(); j++) {
-                        //reset inner discovery
-                        //Arrays.fill(vexp,-1);
-                        //is adjacent?
-                        if (g.get(j)[1] == s) {
-                            //is v discovered?
-                            if (vexp[g.get(j)[0] - 1] < 0) {
-                                //v.color = gray
-                                vexp[g.get(j)[0] - 1] = 0;
-                                //System.out.println("Explored: " + Arrays.toString(vexp));
-                                //time = time + 1
-                                time++;
-                                //push(v)
-                                stack.push(g.get(j)[0]);
-                                //System.out.println("Stack after push (while): " + stack);
-                            }
+            Arrays.fill(exp, -1);
+            exp[i - 1] = 1;
+            //log(Arrays.toString(exp));
+            stack.push(i);
+            time = 1;
+            log(stack);
+//            System.arraycopy(exp, 0, expgray, 0, exp.length);
+            while (!stack.empty()) {
+//                log(Arrays.toString(exp));
+                v = (int) stack.pop();
+                time++;
+//                log(v);
+//                log(stack);
+                for (int j = 0; j < g.size(); j++) {
+//                    log("does "+g.get(j)[1]+"=="+v);
+                    if (v == g.get(j)[1]) {
+                        if ((exp[g.get(j)[0] - 1]) < 0) {
+                            time++;
+                            exp[g.get(j)[0] - 1] = 1;
+                            stack.push(g.get(j)[0]);
                         }
                     }
+
+                    finish[g.get(i)[1] - 1] = time;
                 }
-                //u.color = black
-                exp[i - 1] = 1;
-                //time = time + 1
-                time++;
-                //log(time);
-                finish[i - 1] = time;
-                //System.out.println("Finish times: " + Arrays.toString(finish));
+//                log("Stack at the end = "+stack);
             }
         }
-
-        countscc(finish,answer);
-
-    }
-
-    public static void dfs(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish, String dir) {
-        //log("Start dfs with i=" + i + " and s=" + s);
-        exp[i - 1] = s;
-        int first;
-        int last;
-
-        //System.out.println(Arrays.toString(exp));
-        if (dir.equals("rev")) {
-            first = 1;
-            last = 0;
-        } else {
-            first = 0;
-            last = 1;
-        }
-
-        int head;
-
-        for (int j = 0; j < g.size(); j++) {
-            if (g.get(j)[first] == i) {
-                head = g.get(j)[last];
-                //log("head="+head);
-                //log("The vector "+g.get(j)[0]+"->"+head);
-                if (exp[head - 1] < 0) {
-                    //log("recurse on dfs " + head);
-                    dfs(g, head, s, exp, finish, dir);
-                }
-                if (j > g.size()) {
-                    break;
-                }
-            }
-        }
-        Main.t++;
-        if (dir.equals("rev")) {
-            finish[i - 1] = Main.t;
-        }
-        /*
-        if (dir.equals("rev")) {
-            //System.out.println("Finish = " + Arrays.toString(finish));
-        } else {
-            //System.out.println("Exp = " + Arrays.toString(exp));
-        }
-        */
-        //log("end of dfs");
+        log(Arrays.toString(finish) + " = Finish");
     }
 
     public static void testcase(String datafile, int[] answer) throws IOException {
@@ -359,6 +102,10 @@ public class Main {
         long parseduration = (endparse - startparse);
         log("Parse ran for " + parseduration / 1000000 + " milliseconds");
 
+//        for (int[] edge : edges) {
+//            log(Arrays.toString(edge));
+//        }
+
         Main.t = 0;
         log("Run dfsOnce");
         dfsOnce(edges, answer);
@@ -370,7 +117,7 @@ public class Main {
 
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("SCC", answer);
+        testcase("testcase1", answer);
         log("End Program");
 
         long endTime = System.nanoTime();
@@ -397,12 +144,12 @@ public class Main {
         //Name of the file
         String filePath = new File("").getAbsolutePath();
         String fullPath = filePath + "/src/Files/" + datafile + ".txt";
-            LineNumberReader lnr = new LineNumberReader(new FileReader(new File(fullPath)));
-            lnr.skip(Long.MAX_VALUE);
-            //Add 1 because line index starts at 0
-            // Finally, the LineNumberReader object should be closed to prevent resource leak
-            String[] arr = new String[lnr.getLineNumber() + 1];
-            lnr.close();
+        LineNumberReader lnr = new LineNumberReader(new FileReader(new File(fullPath)));
+        lnr.skip(Long.MAX_VALUE);
+        //Add 1 because line index starts at 0
+        // Finally, the LineNumberReader object should be closed to prevent resource leak
+        String[] arr = new String[lnr.getLineNumber() + 1];
+        lnr.close();
 
 
         try {
