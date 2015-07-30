@@ -25,7 +25,7 @@ public class Main {
 
     }
 
-    public static void dfsloop(ArrayList<int[]> g, int[] scc,int n) {
+    public static void dfsloop(ArrayList<int[]> g, int[] scc,int n, ArrayList<Integer> order) {
         Main.t = 0;
         log("Start dfs loop size "+n);
         int s;
@@ -40,18 +40,20 @@ public class Main {
         //First pass
         for (int i = n; i > 0; i--) {
             howfar(exp);
-            convert =
-            if (exp[i - 1] < 0) {
-                s = i;
+            convert = order.indexOf(i)+1;
+            if (exp[convert - 1] < 0) {
+                s = convert;
                 //System.out.println(Arrays.toString(exp)+" and i="+i);
-                dfs(g, i, s, exp, finish);
+                dfs(g, convert, s, exp, finish);
             }
         }
 
-        countscc(exp,scc);
-        System.out.println("Finish = " + Arrays.toString(finish));
+        countscc(exp, scc);
+//        System.out.println("Finish = " + Arrays.toString(finish));
         System.out.println("Exp = " + Arrays.toString(exp));
-
+        for(int f=0;f<finish.length;f++){
+            order.set(f,finish[f]);
+        }
     }
 
     public static void countscc(int[] exp,int[] scc) {
@@ -100,30 +102,33 @@ public class Main {
         ArrayList<int[]> edges = new ArrayList<>();
         ArrayList<int[]> adj = new ArrayList<>();
         ArrayList<int[]> adjrev = new ArrayList<>();
-
+        ArrayList<Integer> order = new ArrayList<>();
         long startparse = System.nanoTime();
 
         parsedata(edges, datafile);
         int n=maxnodes(edges);
+        for (int i=0;i<n;i++){
+            order.add(i,i+1);
+        }
 
         convertToAdjacency(edges, adj, "fwd");
         convertToAdjacency(edges, adjrev,"rev");
         log("#nodes = "+n);
-        log("Final Adjacency:");
-        for (int i = 0;i<adjrev.size();i++) {
-            log(Arrays.toString(adjrev.get(i)));
-        }
+//        log("Final Adjacency:");
+//        for (int i = 0;i<adjrev.size();i++) {
+//            log(Arrays.toString(adjrev.get(i)));
+//        }
 
         long endparse = System.nanoTime();
         long parseduration = (endparse-startparse);
         log("Pre-processing (extraction, parsing, conversion) ran for " + parseduration / 1000000 + " milliseconds");
 
         log("START FIRST PASS");
-        dfsloop(adjrev, answer, n);
+        dfsloop(adjrev, answer, n, order);
         log("Finishing Times:");
-//        log(Arrays.toString(finish));
+        log(Arrays.toString(order.toArray()));
         log("START SECOND PASS");
-
+        dfsloop(adj,answer, n, order);
 //      System.out.println("The answer to " + datafile + " is " + Arrays.toString(answer));
     }
 
@@ -132,7 +137,7 @@ public class Main {
 
         log("Begin Program");
         int[] answer = new int[5];
-        testcase("testcase1", answer);
+        testcase("SCC", answer);
         log("End Program");
 
         long endTime = System.nanoTime();
