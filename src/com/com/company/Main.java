@@ -12,8 +12,22 @@ public class Main {
 
     public static int t = 0;
 
+    public static void howfar(int[] exp) {
+        double explored = 0;
+        double percentexp;
+        for (int anExp : exp) {
+            if (anExp > 0) {
+                explored++;
+            }
+        }
+        percentexp = (explored / exp.length * 100);
+        log(String.format("%.2f", percentexp) + "% loop completed. " + (int) explored + "/" + exp.length);
+
+    }
+
     public static void dfsloop(ArrayList<int[]> g, int[] scc,int n) {
-        log("Start dfs loop");
+        Main.t = 0;
+        log("Start dfs loop size "+n);
         int s;
 
         int[] exp = new int[n];
@@ -21,59 +35,23 @@ public class Main {
         Arrays.fill(exp, -1);
         Arrays.fill(finish, -1);
 
-        double explored;
-        double percentexp;
+        int convert;
 
         //First pass
-        log("START FIRST PASS");
         for (int i = n; i > 0; i--) {
-            explored = 0;
-            for (int anExp : exp) {
-                if (anExp > 0) {
-                    explored++;
-                }
-            }
-            percentexp = (explored/exp.length*100);
-            log(String.format("%.2f" ,percentexp)+"% loop completed. "+(int) explored+"/"+exp.length);
-
+            howfar(exp);
+            convert =
             if (exp[i - 1] < 0) {
                 s = i;
                 //System.out.println(Arrays.toString(exp)+" and i="+i);
-                dfs(g, i, s, exp, finish, "rev");
+                dfs(g, i, s, exp, finish);
             }
         }
 
-        //Second pass
-        log("START SECOND PASS");
-        Arrays.fill(exp, -1);
-        int fstart;
-        int j;
-        for (int i = n; i > 0; i--) {
-            explored = 0;
-            for (int anExp : exp) {
-                if (anExp > 0) {
-                    explored++;
-                }
-            }
-            percentexp = explored/exp.length*100;
-            log(String.format("%.2f",percentexp)+"% loop completed. "+(int) explored+"/"+exp.length);
-
-            //log("i is currently "+i);
-            j=0;
-            while (finish[j] != i) {
-                //log("finish[j]="+finish[j]+" and i="+i);
-                j++;
-            }
-            fstart = j + 1;
-            if (exp[fstart - 1] < 0) {
-                s = fstart;
-                //System.out.println(Arrays.toString(exp)+" and i="+i);
-                //log("Start dfs from outerloop");
-                dfs(g, fstart, s, exp, finish, "fwd");
-            }
-        }
         countscc(exp,scc);
-        //System.out.println(Arrays.toString(finish));
+        System.out.println("Finish = " + Arrays.toString(finish));
+        System.out.println("Exp = " + Arrays.toString(exp));
+
     }
 
     public static void countscc(int[] exp,int[] scc) {
@@ -90,53 +68,31 @@ public class Main {
         scc[2]=count[count.length-3];
         scc[3]=count[count.length-4];
         scc[4]=count[count.length-5];
-        //System.out.println("SCC="+Arrays.toString(scc));
+        System.out.println("SCC="+Arrays.toString(scc));
 
 
     }
 
 
-    public static void dfs(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish, String dir) {
+    public static void dfs(ArrayList<int[]> g, int i, int s, int[] exp, int[] finish) {
         //log("Start dfs with i=" + i + " and s=" + s);
+        //mark i as explored
+        //also counts as setting leader(i) = s
         exp[i - 1] = s;
-        int first;
-        int last;
 
-        //System.out.println(Arrays.toString(exp));
-        if (dir.equals("rev")) {
-            first = 1;
-            last = 0;
-        } else {
-            first = 0;
-            last = 1;
-        }
+        int[] loop;
+//        log("loop should be: "+ Arrays.toString(g.get(i-1)));
+        loop = g.get(i-1);
+//        log("Loop = "+Arrays.toString(loop));
 
-        int head;
-
-        for (int j = 0; j < g.size(); j++) {
-            if (g.get(j)[first] == i) {
-                head = g.get(j)[last];
-                //log("head="+head);
-                //log("The vector "+g.get(j)[0]+"->"+head);
-                if (exp[head - 1] < 0) {
-                    //log("recurse on dfs " + head);
-                    dfs(g, head, s, exp, finish, dir);
-                }
-                if (j > g.size()) {
-                    break;
-                }
+        for (int j=1;j<loop.length;j++){
+//            log(j+" check exp "+Arrays.toString(exp)+" and loop[j] = "+loop[j]);
+            if(exp[loop[j]-1]<0){
+                dfs(g,loop[j],s,exp,finish);
             }
         }
         Main.t++;
-        if(dir.equals("rev")){
-        finish[i - 1] = Main.t;}
-        /*
-        if (dir.equals("rev")) {
-            //System.out.println("Finish = " + Arrays.toString(finish));
-        } else {
-            //System.out.println("Exp = " + Arrays.toString(exp));
-        }
-        */
+        finish[i - 1] = Main.t;
         //log("end of dfs");
     }
 
@@ -153,17 +109,21 @@ public class Main {
         convertToAdjacency(edges, adj, "fwd");
         convertToAdjacency(edges, adjrev,"rev");
         log("#nodes = "+n);
-//        log("Final Adjacency:");
-//        for (int i = 0;i<adj.size();i++) {
-//            log(Arrays.toString(adj.get(i)));
-//        }
+        log("Final Adjacency:");
+        for (int i = 0;i<adjrev.size();i++) {
+            log(Arrays.toString(adjrev.get(i)));
+        }
 
         long endparse = System.nanoTime();
         long parseduration = (endparse-startparse);
         log("Pre-processing (extraction, parsing, conversion) ran for " + parseduration / 1000000 + " milliseconds");
 
-        Main.t=0;
-//        dfsloop(edges,answer,n);
+        log("START FIRST PASS");
+        dfsloop(adjrev, answer, n);
+        log("Finishing Times:");
+//        log(Arrays.toString(finish));
+        log("START SECOND PASS");
+
 //      System.out.println("The answer to " + datafile + " is " + Arrays.toString(answer));
     }
 
@@ -207,27 +167,22 @@ public class Main {
             last = 0;
         }
 
-        boolean exists;
-
         for (int i=1;i<=n;i++){
-            exists=false;
             hold.clear();
             hold.add(0, i);
             //log("hold = "+hold);
             for (int j=0;j<edges.size();j++){
                 if(edges.get(j)[first]==i){
-                    exists=true;
                     hold.add(edges.get(j)[last]);
                 }
             }
-            if(exists) {
                 converthold = new int[hold.size()];
                 for (int k=0;k<hold.size();k++){
                     converthold[k]=hold.get(k);
                 }
                 //log(Arrays.toString(converthold));
                 alist.add(converthold);
-            }
+
 
         }
     }
